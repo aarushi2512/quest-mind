@@ -22,8 +22,8 @@ const MILESTONES = [
 ]
 
 const card = {
-  background:'#ffffff', border:'1px solid #f1f5f9',
-  borderRadius:14, boxShadow:'0 1px 3px rgba(0,0,0,0.04)',
+  background:'#ffffff', border:'1px solid #e8eeec',
+  borderRadius:18, boxShadow:'0 3px 12px rgba(15,23,42,0.035)',
 }
 
 export default function ProgressView() {
@@ -104,21 +104,25 @@ export default function ProgressView() {
   }
 
   return (
-    <div style={{ padding:'28px 36px', maxWidth:800 }}>
-      <h2 style={{ fontFamily:'Fraunces, Georgia, serif', fontSize:28, fontWeight:300, color:'#0f172a', letterSpacing:'-0.02em', marginBottom:4 }}>
-        Progress
-      </h2>
-      <p style={{ fontSize:13, color:'#94a3b8', marginBottom:24 }}>Consistency over time, surfaced clearly.</p>
+    <div className="qm-page qm-progress">
+      <header className="qm-page-hero">
+        <div>
+          <span className="qm-eyebrow">YOUR GROWTH, AT A GLANCE</span>
+          <h2>Consistency, in motion.</h2>
+          <p>Every small action leaves a mark. Here's how yours are adding up.</p>
+        </div>
+        <div className="qm-hero-badge"><span>{monthRate}%</span><small>active days<br />this month</small></div>
+      </header>
 
       {/* Stat cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:24 }}>
+      <div className="qm-stat-grid qm-stat-grid-4" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:24 }}>
         {[
-          { value: streak,       label:'Current streak',  sub:'+2 vs last week' },
-          { value:`${monthRate}%`,label:'Monthly rate',   sub:'+6% vs last month' },
+          { value: streak,       label:'Current streak',  sub:'days in a row' },
+          { value:`${monthRate}%`,label:'Monthly rate',   sub:'of days with activity' },
           { value: totalDone,    label:'Actions done',    sub:'all time' },
           { value: level,        label:'Current level',   sub:`${xp} XP total` },
         ].map((s,i) => (
-          <div key={i} style={{ ...card, padding:'16px' }}>
+          <div key={i} className="qm-card" style={{ ...card, padding:'16px' }}>
             <div style={{ fontSize:26, fontWeight:700, color:'#0f172a', marginBottom:2 }}>{s.value}</div>
             <div style={{ fontSize:12, fontWeight:500, color:'#475569', marginBottom:2 }}>{s.label}</div>
             <div style={{ fontSize:11, color:'#14b8a6' }}>{s.sub}</div>
@@ -127,9 +131,9 @@ export default function ProgressView() {
       </div>
 
       {/* Charts row */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:20 }}>
+      <div className="qm-two-col" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:20 }}>
         {/* Weekly bar chart */}
-        <div style={{ ...card, padding:'20px' }}>
+        <div className="qm-card" style={{ ...card, padding:'20px' }}>
           <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.08em', color:'#94a3b8', marginBottom:16 }}>THIS WEEK</p>
           <div style={{ display:'flex', alignItems:'flex-end', gap:6, height:80 }}>
             {weekDays.map((d,i) => (
@@ -151,7 +155,7 @@ export default function ProgressView() {
         </div>
 
         {/* Circular progress */}
-        <div style={{ ...card, padding:'20px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
+        <div className="qm-card" style={{ ...card, padding:'20px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
           <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.08em', color:'#94a3b8', marginBottom:16, alignSelf:'flex-start' }}>
             CONSISTENCY SCORE
           </p>
@@ -182,7 +186,7 @@ export default function ProgressView() {
       </div>
 
       {/* 30-day heatmap */}
-      <div style={{ ...card, padding:'20px', marginBottom:20 }}>
+      <div className="qm-card qm-heatmap-card" style={{ ...card, padding:'20px', marginBottom:20 }}>
         <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.08em', color:'#94a3b8', marginBottom:14 }}>
           30-DAY HEATMAP
         </p>
@@ -209,9 +213,9 @@ export default function ProgressView() {
       </div>
 
       {/* Milestones + By area */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+      <div className="qm-two-col" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
         {/* Milestones */}
-        <div style={{ ...card, padding:'20px' }}>
+        <div className="qm-card" style={{ ...card, padding:'20px' }}>
           <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.08em', color:'#94a3b8', marginBottom:14 }}>MILESTONES</p>
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
             {MILESTONES.map(m => {
@@ -238,7 +242,7 @@ export default function ProgressView() {
         </div>
 
         {/* By focus area */}
-        <div style={{ ...card, padding:'20px' }}>
+        <div className="qm-card" style={{ ...card, padding:'20px' }}>
           <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.08em', color:'#94a3b8', marginBottom:14 }}>BY FOCUS AREA</p>
           <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
             {areaStats.map(({ area, rate }) => (

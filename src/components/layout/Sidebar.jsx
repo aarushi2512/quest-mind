@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LayoutDashboard, BarChart2, Lightbulb, Bot, LogOut, Settings, X } from 'lucide-react'
+import { LayoutDashboard, ListChecks, BarChart2, Lightbulb, Bot, LogOut, Settings, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useTasks } from '../../hooks/useTasks'
 
 const NAV = [
   { to:'/dashboard',           icon:LayoutDashboard, label:'Today',    end:true  },
+  { to:'/dashboard/tasks',     icon:ListChecks,      label:'Tasks',    end:false },
   { to:'/dashboard/progress',  icon:BarChart2,       label:'Progress', end:false },
   { to:'/dashboard/insights',  icon:Lightbulb,       label:'Insights', end:false },
   { to:'/dashboard/agents',    icon:Bot,             label:'Agents',   end:false },
@@ -101,7 +102,7 @@ export default function Sidebar({ onProfileOpen }) {
 
   return (
     <>
-      <aside style={{
+      <aside className="qm-sidebar" style={{
         width:220, flexShrink:0,
         background:'#ffffff', borderRight:'1px solid #f1f5f9',
         display:'flex', flexDirection:'column',

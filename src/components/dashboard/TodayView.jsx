@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Zap } from 'lucide-react'
+import { Award, CalendarDays, Check, Flame, Plus, Sparkles, Target, Zap } from 'lucide-react'
 import { format } from 'date-fns'
-import { useAuth }   from '../../hooks/useAuth'
-import { useTasks }  from '../../hooks/useTasks'
-import TaskCard      from '../tasks/TaskCard'
-import TaskModal     from '../tasks/TaskModal'
+import { useAuth } from '../../hooks/useAuth'
+import { useTasks } from '../../hooks/useTasks'
+import TaskCard from '../tasks/TaskCard'
+import TaskModal from '../tasks/TaskModal'
 import { levelProgress, xpToNextLevel, getLevelTitle, xpToLevel } from '../../utils/xpCalculator'
 
 const AREA_COLORS = {
@@ -20,34 +20,55 @@ const INSIGHT_MSGS = [
   'Tasks with clear descriptions get completed 2× more often.',
 ]
 
+const card = {
+  background:'#ffffff', border:'1px solid #e8eeec',
+  borderRadius:18, boxShadow:'0 3px 12px rgba(15, 23, 42, 0.035)',
+}
+
+function ProgressRing({ percent, completed, total }) {
+  const radius = 43
+  const circumference = 2 * Math.PI * radius
+
+  return (
+    <div className="today-ring-wrap" aria-label={`${completed} of ${total} tasks complete`}>
+      <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true">
+        <circle cx="56" cy="56" r={radius} fill="none" stroke="#d8f2eb" strokeWidth="8" />
+        <motion.circle
+          cx="56" cy="56" r={radius} fill="none" stroke="#14b8a6" strokeWidth="8"
+          strokeLinecap="round" strokeDasharray={circumference}
+          initial={{ strokeDashoffset:circumference }}
+          animate={{ strokeDashoffset:circumference * (1 - percent / 100) }}
+          transition={{ duration:0.9, ease:'easeOut' }}
+          transform="rotate(-90 56 56)"
+        />
+      </svg>
+      <div className="today-ring-label">
+        <strong>{percent}%</strong>
+        <span>complete</span>
+      </div>
+    </div>
+  )
+}
+
 export default function TodayView() {
   const { profile } = useAuth()
-  const {
-    todayTasks, todayCompleted, todayActive,
-    loading, finishTask, removeTask, editTask,
-  } = useTasks()
+  const { todayTasks, todayCompleted, todayActive, loading, finishTask, removeTask } = useTasks()
 
-  const [modalOpen,   setModalOpen]   = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
   const [editingTask, setEditingTask] = useState(null)
-  const [xpFlash,     setXpFlash]     = useState(null)
+  const [xpFlash, setXpFlash] = useState(null)
 
-  // Greeting — safe for null user
-  const hour      = new Date().getHours()
-  const greeting  = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = profile?.displayName?.split(' ')[0] || 'there'
-
-  // XP/Level
-  const xp       = profile?.xp    || 0
-  const level    = xpToLevel(xp)
-  const progress = levelProgress(xp)
-  const toNext   = xpToNextLevel(xp)
-  const streak   = profile?.currentStreak || 0
-
-  // Today counts from actual scheduled tasks
-  const totalToday    = todayTasks.length
+  const xp = profile?.xp || 0
+  const level = xpToLevel(xp)
+  const levelPct = levelProgress(xp)
+  const toNext = xpToNextLevel(xp)
+  const streak = profile?.currentStreak || 0
+  const totalToday = todayTasks.length
   const completedCount = todayCompleted.length
-  const pct           = totalToday > 0 ? Math.min((completedCount / totalToday) * 100, 100) : 0
-
+  const pct = totalToday > 0 ? Math.min((completedCount / totalToday) * 100, 100) : 0
   const insight = INSIGHT_MSGS[new Date().getDate() % INSIGHT_MSGS.length]
 
   const handleComplete = async (taskId) => {
@@ -60,206 +81,140 @@ export default function TodayView() {
 
   const handleEdit = (task) => { setEditingTask(task); setModalOpen(true) }
   const handleModalClose = () => { setModalOpen(false); setEditingTask(null) }
+  const openNewTask = () => { setEditingTask(null); setModalOpen(true) }
 
-  const card = {
-    background:'#ffffff', border:'1px solid #f1f5f9',
-    borderRadius:14, boxShadow:'0 1px 3px rgba(0,0,0,0.04)',
-  }
+  const stats = [
+    {
+      label:'Current streak', value:streak > 0 ? `${streak} days` : 'Start today',
+      detail:streak > 0 ? 'Keep your rhythm going' : 'Your next streak starts here',
+      icon:Flame, color:'#f97316', tint:'#fff4e9',
+    },
+    {
+      label:'Total XP', value:xp.toLocaleString(), detail:'Every action adds up',
+      icon:Zap, color:'#0d9488', tint:'#e9faf6',
+    },
+    {
+      label:`Level ${level} · ${getLevelTitle(level)}`, value:`${toNext} XP to go`,
+      detail:`${xp.toLocaleString()} XP earned so far`, icon:Award, color:'#6366f1', tint:'#f1f0ff',
+      progress:levelPct,
+    },
+  ]
 
   return (
-    <div style={{ padding:'28px 36px', maxWidth:720 }}>
-
-      {/* Greeting */}
-      <motion.div initial={{ opacity:0, y:6 }} animate={{ opacity:1, y:0 }} style={{ marginBottom:24 }}>
-        <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
-          <div>
-            <h2 style={{
-              fontFamily:'Fraunces, Georgia, serif', fontSize:30,
-              fontWeight:300, letterSpacing:'-0.03em', color:'#0f172a', margin:0,
-            }}>
-              {greeting},{' '}
-              <em style={{ color:'#14b8a6', fontStyle:'italic' }}>{firstName}</em>.
-            </h2>
-            <p style={{ fontSize:13, color:'#94a3b8', marginTop:4, marginBottom:0 }}>
-              {format(new Date(), 'EEEE, MMMM d')}
-            </p>
-          </div>
-          <div style={{
-            padding:'5px 13px', borderRadius:99,
-            background:'#f0fdfa', border:'1px solid #99f6e4',
-            fontSize:12, fontWeight:500, color:'#0d9488', alignSelf:'flex-start',
-          }}>
-            {completedCount} of {totalToday || 0} complete
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Today's progress bar */}
-      <div style={{ ...card, padding:'14px 18px', marginBottom:18 }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
-          <span style={{ fontSize:11, fontWeight:600, letterSpacing:'0.08em', color:'#94a3b8' }}>
-            TODAY'S PROGRESS
-          </span>
-          <span style={{ fontSize:11, padding:'2px 8px', borderRadius:99, background:'#f0fdfa', color:'#0d9488', fontWeight:500 }}>
-            {totalToday > 0 ? `${completedCount}/${totalToday}` : 'No tasks today'}
-          </span>
-        </div>
-        <div style={{ height:5, background:'#f1f5f9', borderRadius:99, overflow:'hidden' }}>
-          <motion.div
-            style={{ height:'100%', background:'#14b8a6', borderRadius:99 }}
-            initial={{ width:0 }}
-            animate={{ width:`${pct}%` }}
-            transition={{ duration:0.8, ease:'easeOut' }}
-          />
-        </div>
-      </div>
-
-      {/* Stats row */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12, marginBottom:18 }}>
-        {[
-          { label:'Current streak', value: streak > 0 ? `🔥 ${streak}d` : '—' },
-          { label:'XP total',       value: xp.toLocaleString() },
-          {
-            label:'Level',
-            value: (
-              <span>
-                <span style={{ fontSize:20, fontWeight:700, color:'#0f172a' }}>{level}</span>
-                <span style={{ fontSize:11, color:'#94a3b8', marginLeft:5 }}>· {getLevelTitle(level)}</span>
-              </span>
-            ),
-          },
-        ].map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity:0, y:8 }}
-            animate={{ opacity:1, y:0 }}
-            transition={{ delay: i * 0.06 }}
-            style={{ ...card, padding:'14px 16px' }}
-          >
-            <div style={{ fontSize:20, fontWeight:600, color:'#0f172a', marginBottom:2 }}>
-              {s.value}
-            </div>
-            <div style={{ fontSize:11, color:'#94a3b8' }}>{s.label}</div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* XP progress bar */}
-      <div style={{ ...card, padding:'12px 18px', marginBottom:22 }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-            <Zap size={13} color="#14b8a6" />
-            <span style={{ fontSize:12, fontWeight:500, color:'#475569' }}>XP to Level {level + 1}</span>
-          </div>
-          <span style={{ fontSize:11, color:'#94a3b8' }}>{toNext} XP remaining</span>
-        </div>
-        <div style={{ height:4, background:'#f1f5f9', borderRadius:99, overflow:'hidden' }}>
-          <motion.div
-            style={{ height:'100%', background:'#14b8a6', borderRadius:99 }}
-            initial={{ width:0 }}
-            animate={{ width:`${progress}%` }}
-            transition={{ duration:0.8 }}
-          />
-        </div>
-      </div>
-
-      {/* Today's priorities header */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
-        <span style={{ fontSize:11, fontWeight:600, letterSpacing:'0.08em', color:'#94a3b8' }}>
-          TODAY'S PRIORITIES
-        </span>
-        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-          <span style={{ fontSize:11, padding:'2px 8px', borderRadius:99, background:'#f0fdfa', color:'#0d9488', fontWeight:500 }}>
-            Planning Agent
-          </span>
-          <button
-            onClick={() => { setEditingTask(null); setModalOpen(true) }}
-            style={{
-              display:'flex', alignItems:'center', gap:5, padding:'5px 12px', borderRadius:8,
-              background:'#14b8a6', border:'none', color:'#fff', fontSize:12,
-              fontWeight:500, cursor:'pointer', fontFamily:'inherit',
-            }}
-          >
-            <Plus size={12} /> Add task
-          </button>
-        </div>
-      </div>
-
-      {/* Task list */}
-      {loading ? (
-        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-          {[1,2,3].map(i => (
-            <div key={i} style={{
-              height:64, borderRadius:12,
-              background:'linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%)',
-              backgroundSize:'200% 100%',
-              animation:'shimmer 1.5s infinite',
-            }} />
-          ))}
-        </div>
-      ) : totalToday === 0 ? (
-        <div style={{ ...card, padding:'36px', textAlign:'center' }}>
-          <div style={{ fontSize:32, marginBottom:10 }}>📋</div>
-          <p style={{ fontSize:14, fontWeight:500, color:'#0f172a', marginBottom:6 }}>No tasks scheduled for today</p>
-          <p style={{ fontSize:13, color:'#94a3b8', marginBottom:16, lineHeight:1.6 }}>
-            Add a task to get started. Daily or recurring tasks will show up here automatically.
+    <div className="today-shell">
+      <motion.section
+        className="today-hero"
+        initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.35 }}
+      >
+        <div className="today-hero-copy">
+          <div className="today-date-pill"><CalendarDays size={13} /> {format(new Date(), 'EEEE, MMMM d')}</div>
+          <h2>
+            {greeting}, <em>{firstName}</em>
+          </h2>
+          <p className="today-hero-subtitle">
+            Small steps make a strong streak. Pick one priority and get your momentum going.
           </p>
-          <button
-            onClick={() => { setEditingTask(null); setModalOpen(true) }}
-            style={{
-              padding:'9px 20px', borderRadius:9, background:'#14b8a6',
-              border:'none', color:'#fff', fontSize:13, fontWeight:500,
-              cursor:'pointer', fontFamily:'inherit',
-            }}
+          <div className="today-momentum">
+            <span className="today-momentum-icon"><Target size={15} /></span>
+            <span>
+              <strong>{totalToday === 0 ? 'A fresh start' : `${totalToday - completedCount} ${totalToday - completedCount === 1 ? 'priority' : 'priorities'} left`}</strong>
+              <small>{totalToday === 0 ? 'Add a task to shape your day' : 'You have this — one step at a time'}</small>
+            </span>
+          </div>
+        </div>
+        <div className="today-hero-progress">
+          <ProgressRing percent={pct} completed={completedCount} total={totalToday} />
+          <span className="today-progress-caption">
+            <strong>{completedCount}/{totalToday}</strong> priorities done
+          </span>
+        </div>
+        <div className="today-hero-glow" aria-hidden="true" />
+      </motion.section>
+
+      <section className="today-stats" aria-label="Your progress">
+        {stats.map(({ label, value, detail, icon:Icon, color, tint, progress }, index) => (
+          <motion.article
+            key={label} className="today-stat-card"
+            initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.08 + index * 0.07 }}
           >
-            + Add first task
-          </button>
-        </div>
-      ) : (
-        <div>
-          <AnimatePresence>
-            {todayActive.map(task => (
-              <div key={task.id} style={{ marginBottom:8, position:'relative' }}>
-                <TaskCard
-                  task={task}
-                  onComplete={handleComplete}
-                  onEdit={handleEdit}
-                  onDelete={removeTask}
-                />
-              </div>
-            ))}
-          </AnimatePresence>
-
-          {todayCompleted.length > 0 && (
-            <div style={{ marginTop:16 }}>
-              <p style={{ fontSize:11, fontWeight:600, letterSpacing:'0.08em', color:'#94a3b8', marginBottom:8 }}>
-                COMPLETED TODAY
-              </p>
-              <AnimatePresence>
-                {todayCompleted.map(task => (
-                  <div key={task.id} style={{ marginBottom:8, position:'relative' }}>
-                    <TaskCard
-                      task={task}
-                      onComplete={handleComplete}
-                      onEdit={handleEdit}
-                      onDelete={removeTask}
-                    />
-                  </div>
-                ))}
-              </AnimatePresence>
+            <div className="today-stat-top">
+              <span className="today-stat-icon" style={{ background:tint, color }}><Icon size={17} /></span>
+              {index === 0 && streak > 0 && <span className="today-stat-note">Best: {profile?.longestStreak || streak}d</span>}
             </div>
-          )}
-        </div>
-      )}
+            <strong className="today-stat-value">{value}</strong>
+            <span className="today-stat-label">{label}</span>
+            <span className="today-stat-detail">{detail}</span>
+            {progress !== undefined && (
+              <div className="today-level-track" aria-label={`${progress}% to next level`}>
+                <motion.div initial={{ width:0 }} animate={{ width:`${progress}%` }} transition={{ duration:0.7 }} />
+              </div>
+            )}
+          </motion.article>
+        ))}
+      </section>
 
-      {/* Focus area tags */}
+      <section className="today-priorities">
+        <div className="today-section-heading">
+          <div>
+            <p className="today-eyebrow">YOUR DAILY PLAN</p>
+            <h3>Today's priorities</h3>
+            <p className="today-section-subtitle">Make progress at your own pace.</p>
+          </div>
+          <div className="today-plan-actions">
+            <span className="today-agent-pill"><Sparkles size={13} /> Planning Agent</span>
+            <button className="today-add-button" onClick={openNewTask}><Plus size={15} /> Add task</button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="today-loading-list">
+            {[1,2,3].map(i => <div key={i} className="today-skeleton" />)}
+          </div>
+        ) : totalToday === 0 ? (
+          <div className="today-empty-card">
+            <div className="today-empty-icon"><Target size={22} /></div>
+            <h4>Your day is a blank canvas</h4>
+            <p>Add a small, doable action and give your momentum somewhere to begin.</p>
+            <button className="today-add-button" onClick={openNewTask}><Plus size={15} /> Add your first task</button>
+          </div>
+        ) : (
+          <>
+            {todayActive.length > 0 && (
+              <div className="today-task-list">
+                <AnimatePresence>
+                  {todayActive.map(task => (
+                    <div key={task.id} className="today-task-row">
+                      <TaskCard task={task} onComplete={handleComplete} onEdit={handleEdit} onDelete={removeTask} />
+                    </div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+            {todayCompleted.length > 0 && (
+              <div className="today-completed-group">
+                <div className="today-completed-heading"><Check size={14} /> Completed today <span>{todayCompleted.length}</span></div>
+                <div className="today-task-list">
+                  <AnimatePresence>
+                    {todayCompleted.map(task => (
+                      <div key={task.id} className="today-task-row">
+                        <TaskCard task={task} onComplete={handleComplete} onEdit={handleEdit} onDelete={removeTask} />
+                      </div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
       {(profile?.focusAreas || []).length > 0 && (
-        <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginTop:18, marginBottom:20 }}>
+        <div className="today-focus-row">
+          <span>Building consistency in</span>
           {profile.focusAreas.map(area => (
-            <span key={area} style={{
-              fontSize:11, fontWeight:500, padding:'3px 10px', borderRadius:99,
-              background:`${AREA_COLORS[area] || '#14b8a6'}18`,
-              color: AREA_COLORS[area] || '#14b8a6',
+            <span key={area} className="today-focus-chip" style={{
+              background:`${AREA_COLORS[area] || '#14b8a6'}14`,
+              color:AREA_COLORS[area] || '#14b8a6',
             }}>
               {area.replace(/([A-Z])/g, ' $1').trim()}
             </span>
@@ -267,52 +222,110 @@ export default function TodayView() {
         </div>
       )}
 
-      {/* Insights Agent card */}
-      <div style={{
-        ...card, padding:'16px 18px',
-        borderLeft:'3px solid #3b82f6',
-      }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:7 }}>
-          <span style={{ fontSize:13, color:'#3b82f6' }}>⊞</span>
-          <span style={{ fontSize:10, fontWeight:700, letterSpacing:'0.1em', color:'#94a3b8' }}>
-            INSIGHTS AGENT
-          </span>
+      <aside className="today-insight-card">
+        <div className="today-insight-icon"><Sparkles size={17} /></div>
+        <div>
+          <p className="today-eyebrow">A NOTE FROM YOUR INSIGHTS AGENT</p>
+          <p className="today-insight-text">{insight}</p>
         </div>
-        <p style={{ fontSize:13, color:'#475569', lineHeight:1.65, margin:0 }}>
-          {insight}
-        </p>
-      </div>
+      </aside>
 
-      {/* XP flash */}
       <AnimatePresence>
         {xpFlash && (
           <motion.div
-            initial={{ opacity:0, y:-10, scale:0.9 }}
-            animate={{ opacity:1, y:0, scale:1 }}
-            exit={{ opacity:0, scale:0.9 }}
-            style={{
-              position:'fixed', top:60, right:24,
-              background:'#14b8a6', color:'#fff',
-              padding:'8px 18px', borderRadius:10,
-              fontSize:14, fontWeight:700,
-              boxShadow:'0 4px 20px rgba(20,184,166,0.3)',
-              zIndex:100,
-            }}
-          >
-            {xpFlash}
-          </motion.div>
+            initial={{ opacity:0, y:-10, scale:0.9 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, scale:0.9 }}
+            className="today-xp-flash"
+          >{xpFlash}</motion.div>
         )}
       </AnimatePresence>
 
       <TaskModal open={modalOpen} onClose={handleModalClose} task={editingTask} />
 
       <style>{`
-        @keyframes shimmer {
-          0%   { background-position: -200% 0; }
-          100% { background-position:  200% 0; }
+        .today-shell { max-width:1020px; width:100%; margin:0 auto; padding:30px clamp(18px, 3.5vw, 40px) 40px; color:#0f172a; }
+        .today-hero { position:relative; overflow:hidden; display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:224px; padding:30px 34px; margin-bottom:18px; border:1px solid #cceee5; border-radius:24px; background:linear-gradient(115deg,#effbf7 0%,#f7fcfa 58%,#ffffff 100%); box-shadow:0 8px 24px rgba(13,148,136,.055); }
+        .today-hero-copy { position:relative; z-index:1; max-width:590px; }
+        .today-date-pill { display:inline-flex; align-items:center; gap:7px; padding:6px 10px; color:#0f766e; background:rgba(255,255,255,.78); border:1px solid #d7f2ea; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.01em; }
+        .today-hero h2 { margin:14px 0 6px; font-family:Fraunces, Georgia, serif; font-size:clamp(27px,3vw,36px); line-height:1.16; font-weight:400; letter-spacing:-.04em; color:#142d2a; }
+        .today-hero h2 em { color:#0d9488; font-weight:400; }
+        .today-hero-subtitle { max-width:470px; margin:0; color:#647b77; font-size:13px; line-height:1.7; }
+        .today-momentum { display:flex; align-items:center; gap:10px; margin-top:21px; }
+        .today-momentum-icon { display:grid; place-items:center; width:32px; height:32px; border-radius:10px; background:#d8f4eb; color:#0d9488; }
+        .today-momentum strong, .today-momentum small { display:block; }
+        .today-momentum strong { color:#24423e; font-size:12px; font-weight:650; }
+        .today-momentum small { margin-top:2px; color:#80948f; font-size:11px; }
+        .today-hero-progress { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:7px; flex-shrink:0; padding:15px 18px; border:1px solid rgba(204,238,229,.85); border-radius:20px; background:rgba(255,255,255,.68); }
+        .today-ring-wrap { position:relative; width:112px; height:112px; }
+        .today-ring-label { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .today-ring-label strong { color:#173d37; font-size:23px; line-height:1.1; letter-spacing:-.04em; }
+        .today-ring-label span { margin-top:3px; color:#8aa09b; font-size:10px; }
+        .today-progress-caption { color:#819590; font-size:10px; }
+        .today-progress-caption strong { color:#0f766e; font-weight:700; }
+        .today-hero-glow { position:absolute; width:300px; height:300px; right:10%; top:-220px; border-radius:50%; background:rgba(45,212,191,.09); filter:blur(1px); }
+        .today-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; margin-bottom:33px; }
+        .today-stat-card { min-width:0; padding:16px 17px 14px; border:1px solid #e8eeec; border-radius:17px; background:#fff; box-shadow:0 3px 12px rgba(15,23,42,.03); }
+        .today-stat-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:11px; }
+        .today-stat-icon { display:grid; place-items:center; width:32px; height:32px; border-radius:10px; }
+        .today-stat-note { padding:4px 7px; border-radius:99px; background:#fff7ed; color:#c2410c; font-size:9px; font-weight:600; }
+        .today-stat-value { display:block; overflow:hidden; color:#172b28; font-size:19px; font-weight:650; letter-spacing:-.035em; text-overflow:ellipsis; white-space:nowrap; }
+        .today-stat-label { display:block; margin-top:2px; color:#536864; font-size:11px; font-weight:600; }
+        .today-stat-detail { display:block; margin-top:4px; color:#9aa9a5; font-size:10px; }
+        .today-level-track { height:4px; margin-top:11px; overflow:hidden; border-radius:99px; background:#edf2f0; }
+        .today-level-track div { height:100%; border-radius:99px; background:linear-gradient(90deg,#14b8a6,#5eead4); }
+        .today-priorities { margin-bottom:20px; }
+        .today-section-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:15px; }
+        .today-eyebrow { margin:0 0 5px; color:#91a19d; font-size:9px; font-weight:750; letter-spacing:.14em; }
+        .today-section-heading h3 { margin:0; color:#1a302c; font-family:Fraunces, Georgia, serif; font-size:24px; font-weight:400; letter-spacing:-.025em; }
+        .today-section-subtitle { margin:3px 0 0; color:#9aa9a5; font-size:11px; }
+        .today-plan-actions { display:flex; align-items:center; gap:8px; }
+        .today-agent-pill { display:inline-flex; align-items:center; gap:5px; padding:7px 10px; border:1px solid #d8f2eb; border-radius:99px; background:#f0fbf7; color:#0f8b7e; font-size:10px; font-weight:600; white-space:nowrap; }
+        .today-add-button { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:9px 13px; border:0; border-radius:10px; background:#0d9488; color:#fff; box-shadow:0 3px 9px rgba(13,148,136,.16); font-family:inherit; font-size:11px; font-weight:600; cursor:pointer; transition:background .15s, transform .15s; white-space:nowrap; }
+        .today-add-button:hover { background:#0f766e; transform:translateY(-1px); }
+        .today-task-list { display:flex; flex-direction:column; gap:9px; }
+        .today-task-row { position:relative; }
+        .today-task-row > div { border-radius:15px !important; box-shadow:0 3px 12px rgba(15,23,42,.035) !important; transition:transform .18s, box-shadow .18s !important; }
+        .today-task-row > div:hover { transform:translateY(-1px); box-shadow:0 8px 18px rgba(15,23,42,.07) !important; }
+        .today-completed-group { margin-top:22px; }
+        .today-completed-heading { display:flex; align-items:center; gap:7px; margin-bottom:9px; color:#7d918c; font-size:11px; font-weight:650; }
+        .today-completed-heading svg { color:#14b8a6; }
+        .today-completed-heading span { display:grid; place-items:center; min-width:19px; height:19px; margin-left:1px; padding:0 5px; border-radius:99px; background:#e8f8f3; color:#0f766e; font-size:9px; }
+        .today-empty-card { padding:33px 20px; border:1px dashed #b8e7da; border-radius:18px; background:linear-gradient(130deg,#f4fcf9,#fff); text-align:center; }
+        .today-empty-icon { display:grid; place-items:center; width:48px; height:48px; margin:0 auto 12px; border-radius:15px; background:#ddf6ee; color:#0d9488; }
+        .today-empty-card h4 { margin:0 0 5px; color:#1a302c; font-family:Fraunces, Georgia, serif; font-size:20px; font-weight:450; }
+        .today-empty-card p { max-width:340px; margin:0 auto 16px; color:#8a9b97; font-size:12px; line-height:1.6; }
+        .today-focus-row { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:20px 0; color:#94a3a0; font-size:10px; }
+        .today-focus-chip { padding:5px 9px; border-radius:99px; font-size:10px; font-weight:600; }
+        .today-insight-card { display:flex; align-items:flex-start; gap:12px; padding:16px 18px; border:1px solid #e2eafb; border-radius:16px; background:linear-gradient(110deg,#f6f8ff,#fff 75%); }
+        .today-insight-icon { display:grid; place-items:center; width:32px; height:32px; flex-shrink:0; border-radius:10px; background:#e9efff; color:#5276d7; }
+        .today-insight-card .today-eyebrow { color:#8292bc; }
+        .today-insight-text { margin:0; color:#53627c; font-size:12px; line-height:1.65; }
+        .today-loading-list { display:flex; flex-direction:column; gap:9px; }
+        .today-skeleton { height:72px; border-radius:15px; background:linear-gradient(90deg,#f0f4f2 25%,#e7eeeb 50%,#f0f4f2 75%); background-size:200% 100%; animation:today-shimmer 1.5s infinite; }
+        .today-xp-flash { position:fixed; top:70px; right:24px; z-index:100; padding:9px 17px; border-radius:12px; background:#0d9488; color:#fff; box-shadow:0 6px 20px rgba(13,148,136,.25); font-size:13px; font-weight:700; }
+        @keyframes today-shimmer { from { background-position:-200% 0; } to { background-position:200% 0; } }
+        @media (max-width:700px) {
+          .today-shell { padding-top:20px; }
+          .today-hero { min-height:0; padding:23px 20px; }
+          .today-hero-progress { padding:10px; }
+          .today-ring-wrap, .today-ring-wrap svg { width:90px; height:90px; }
+          .today-ring-label strong { font-size:20px; }
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+        @media (max-width:520px) {
+          .today-hero { align-items:flex-start; gap:8px; padding:20px 17px; }
+          .today-hero-progress { margin-top:8px; padding:8px 6px; }
+          .today-ring-wrap, .today-ring-wrap svg { width:76px; height:76px; }
+          .today-progress-caption { font-size:9px; }
+          .today-hero-subtitle { font-size:12px; }
+          .today-momentum { margin-top:15px; }
+          .today-stats { gap:8px; }
+          .today-stat-card { padding:12px 10px; }
+          .today-stat-value { font-size:16px; }
+          .today-stat-label { font-size:10px; }
+          .today-stat-detail { font-size:9px; }
+          .today-section-heading { align-items:flex-start; flex-direction:column; }
+          .today-plan-actions { width:100%; justify-content:space-between; }
+          .today-agent-pill { font-size:9px; }
+        }
       `}</style>
     </div>
   )

@@ -250,7 +250,7 @@ export default function AgentsView() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#f8fafc' }}>
+    <div className="qm-agents-view" style={{ display: 'flex', height: '100%', background: '#f8fafc' }}>
       {/* Agent list sidebar */}
       <div style={{
         width: 220, borderRight: '1px solid #f1f5f9',

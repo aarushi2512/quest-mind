@@ -23,7 +23,7 @@ export default function ProfileModal({ open, onClose }) {
   const [tab, setTab] = useState('account')
 
   return (
-    <Modal open={open} onClose={onClose} size="lg" showClose title="">
+    <Modal open={open} onClose={onClose} size="lg" showClose title="" className="qm-profile-modal">
       {/* Custom header */}
       <div className="px-5 pt-4 pb-0">
         <div className="flex items-center gap-3 mb-4">

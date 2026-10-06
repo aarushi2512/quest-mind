@@ -25,18 +25,22 @@ export default function TaskList() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="font-display text-2xl font-light text-ink">Tasks</h2>
+    <div className="qm-page qm-task-page">
+      <header className="qm-page-hero qm-task-hero">
+        <div>
+          <span className="qm-eyebrow">YOUR PERSONAL PLAYBOOK</span>
+          <h2>Make it happen.</h2>
+          <p>Keep your actions clear, your goals close, and your momentum growing.</p>
+        </div>
         <Button size="sm" onClick={() => setModalOpen(true)} icon={<Plus size={13} />}>
           New task
         </Button>
-      </div>
+      </header>
 
-      <TaskFilters filters={filters} onChange={setFilters} />
+      <div className="qm-task-filters"><TaskFilters filters={filters} onChange={setFilters} /></div>
 
       {loading ? (
-        <div className="space-y-2 mt-4">
+        <div className="space-y-2 mt-4 qm-task-list">
           {[1,2,3,4].map(i => <div key={i} className="h-16 skeleton rounded-2xl" />)}
         </div>
       ) : tasks.length === 0 ? (
@@ -56,7 +60,7 @@ export default function TaskList() {
               >
                 <Card
                   padding="md"
-                  className={`flex items-start gap-3 priority-${task.priority} ${task.completed ? 'opacity-60' : ''}`}
+                  className={`flex items-start gap-3 priority-${task.priority} qm-task-row ${task.completed ? 'opacity-60' : ''}`}
                 >
                   <button
                     onClick={() => finishTask(task.id, task.category)}

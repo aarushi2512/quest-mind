@@ -14,7 +14,7 @@ export default function Header({ title }) {
   const toNext  = xpToNextLevel(xp)
 
   return (
-    <header style={{
+    <header className="qm-topbar" style={{
       height:54, flexShrink:0,
       background: isDark ? '#1e293b' : '#ffffff',
       borderBottom:`1px solid ${isDark ? '#334155' : '#f1f5f9'}`,

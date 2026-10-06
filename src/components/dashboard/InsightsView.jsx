@@ -18,10 +18,10 @@ const AREA_LABELS = {
 function InsightCard({ agent, title, body }) {
   const tag = AGENT_TAGS[agent] || AGENT_TAGS.insights
   return (
-    <div style={{
-      background:'#ffffff', border:'1px solid #f1f5f9',
-      borderRadius:14, padding:'18px 20px',
-      boxShadow:'0 1px 3px rgba(0,0,0,0.04)',
+    <div className="qm-insight-card" style={{
+      background:'#ffffff', border:'1px solid #e8eeec',
+      borderRadius:18, padding:'19px 21px',
+      boxShadow:'0 3px 12px rgba(15,23,42,0.035)',
     }}>
       <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
         <span style={{
@@ -42,7 +42,7 @@ function InsightCard({ agent, title, body }) {
 function ProgressToUnlock({ completed, target = 5 }) {
   const pct = Math.min((completed / target) * 100, 100)
   return (
-    <div style={{
+    <div className="qm-unlock-card" style={{
       background:'#ffffff', border:'1px solid #f1f5f9',
       borderRadius:16, padding:'32px 24px', textAlign:'center',
       boxShadow:'0 1px 3px rgba(0,0,0,0.04)',
@@ -162,19 +162,20 @@ export default function InsightsView() {
   }, [allTasks, streak, longest, level, hasEnoughData, totalCompletions])
 
   return (
-    <div style={{ padding:'28px 36px', maxWidth:700 }}>
-      <h2 style={{
-        fontFamily:'Fraunces, Georgia, serif', fontSize:28,
-        fontWeight:300, color:'#0f172a', letterSpacing:'-0.02em', marginBottom:4,
-      }}>
-        Insights
-      </h2>
-      <p style={{ fontSize:13, color:'#94a3b8', marginBottom:24 }}>
+    <div className="qm-page qm-insights">
+      <header className="qm-page-hero">
+        <div>
+          <span className="qm-eyebrow">PATTERNS THAT MOVE YOU FORWARD</span>
+          <h2>Your progress has a story.</h2>
+          <p>
         {hasEnoughData
           ? `Patterns from your ${totalCompletions} completed actions.`
           : 'Your agents are learning. Complete more tasks to unlock personalized analysis.'
         }
-      </p>
+          </p>
+        </div>
+        <div className="qm-hero-badge qm-insight-badge"><span>AI</span><small>personalized<br />observations</small></div>
+      </header>
 
       {!hasEnoughData ? (
         <ProgressToUnlock completed={totalCompletions} target={5} />

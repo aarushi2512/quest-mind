@@ -1,87 +1,105 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Zap, Flame, BarChart2 } from 'lucide-react'
+import { ArrowRight, BarChart2, Check, Flame, Sparkles, Zap } from 'lucide-react'
+
+const FEATURES = [
+  { icon:Flame, label:'Build your streak', desc:'Make consistency feel rewarding.', color:'#f97316', tint:'#fff3e8' },
+  { icon:Zap, label:'Grow with every action', desc:'Turn small wins into real momentum.', color:'#0d9488', tint:'#e8faf5' },
+  { icon:BarChart2, label:'See what works', desc:'Find patterns in your progress.', color:'#6366f1', tint:'#f0efff' },
+]
+
+const PREVIEW_TASKS = [
+  { label:'Read 10 pages', done:true },
+  { label:'Take a mindful break', done:true },
+  { label:'Plan tomorrow', done:false },
+]
+
+function ProductPreview() {
+  return (
+    <motion.div
+      className="home-preview-wrap"
+      initial={{ opacity:0, y:18, rotate:1 }} animate={{ opacity:1, y:0, rotate:0 }}
+      transition={{ duration:0.55, delay:0.12 }}
+    >
+      <div className="home-preview-glow" />
+      <div className="home-preview-card">
+        <div className="home-preview-topline">
+          <div className="home-preview-brand"><span /> QuestMind</div>
+          <span className="home-preview-demo">PRODUCT PREVIEW</span>
+        </div>
+        <div className="home-preview-title-row">
+          <div><small>YOUR DAY, IN FOCUS</small><h2>A little progress goes a long way.</h2></div>
+          <div className="home-preview-ring"><strong>67%</strong></div>
+        </div>
+        <div className="home-preview-streak">
+          <div className="home-preview-flame"><Flame size={16} /></div>
+          <div><strong>7 day streak</strong><small>You're showing up for yourself.</small></div>
+          <Sparkles size={16} className="home-preview-spark" />
+        </div>
+        <div className="home-preview-list-heading"><span>Today's actions</span><span>2 of 3 done</span></div>
+        <div className="home-preview-tasks">
+          {PREVIEW_TASKS.map(task => (
+            <div key={task.label} className={`home-preview-task ${task.done ? 'is-done' : ''}`}>
+              <span className="home-preview-check">{task.done && <Check size={12} />}</span>
+              <span>{task.label}</span>
+              {task.done && <small>DONE</small>}
+            </div>
+          ))}
+        </div>
+        <div className="home-preview-footer"><span>Small steps. Stronger you.</span><span className="home-preview-footer-dot" /></div>
+      </div>
+      <div className="home-float-chip"><span><Zap size={13} /></span><strong>+20 XP</strong><small>earned today</small></div>
+    </motion.div>
+  )
+}
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-surface-alt flex flex-col">
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-100 bg-white">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-brand-600" />
-          <span className="font-display text-lg font-medium text-ink tracking-tight">QuestMind</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link to="/auth" className="text-sm text-ink-sub hover:text-ink transition-colors">Sign in</Link>
-          <Link
-            to="/auth"
-            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl transition-colors"
-          >
-            Get started
-          </Link>
+    <div className="qm-home">
+      <nav className="home-nav">
+        <Link to="/" className="home-wordmark"><span className="home-mark"><Sparkles size={15} /></span><span>QuestMind</span></Link>
+        <div className="home-nav-actions">
+          <Link to="/auth" className="home-signin">Sign in</Link>
+          <Link to="/auth" className="home-nav-cta">Get started <ArrowRight size={14} /></Link>
         </div>
       </nav>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-2xl"
-        >
-          {/* <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-medium mb-6">
-            <Zap size={12} /> Hackanova 5.0 — Agentic AI Track
-          </div> */}
+      <main className="home-main">
+        <section className="home-hero">
+          <motion.div
+            className="home-copy"
+            initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45 }}
+          >
+            <div className="home-eyebrow"><span className="home-eyebrow-pulse" /> A calmer way to grow</div>
+            <h1>Build habits that<br /><em>actually stick.</em></h1>
+            <p className="home-lede">Make your daily actions count. Build a rhythm that fits your life, celebrate the small wins, and see how far they take you.</p>
+            <div className="home-ctas">
+              <Link to="/auth" className="home-primary-cta">Start your journey <ArrowRight size={16} /></Link>
+              <Link to="/dashboard" className="home-secondary-cta">View dashboard <span>↗</span></Link>
+            </div>
+            <div className="home-proof"><span className="home-proof-dots"><i /><i /><i /></span><span>One thoughtful step at a time</span></div>
+          </motion.div>
+          <ProductPreview />
+        </section>
 
-          <h1 className="font-display text-5xl font-light tracking-tight text-ink leading-tight mb-4">
-            Build habits that<br />
-            <em className="text-brand-600">actually stick.</em>
-          </h1>
-
-          <p className="text-lg text-ink-sub font-light mb-10 leading-relaxed">
-            QuestMind turns your daily habits into measurable progress.
-            Track streaks, earn XP, and unlock your potential with AI-powered insights.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
-            <Link
-              to="/auth"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl transition-colors text-sm"
-            >
-              Start your journey <ArrowRight size={15} />
-            </Link>
-            <Link
-              to="/dashboard"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white border border-gray-200 hover:border-gray-300 text-ink font-medium rounded-xl transition-colors text-sm"
-            >
-              View dashboard
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
-            {[
-              { icon: <Flame size={16} className="text-orange-500" />, label: 'Streak system', desc: 'Per-category + ice protection' },
-              { icon: <Zap size={16} className="text-brand-500" />,    label: 'XP & Levels',  desc: '100 levels, adaptive scoring' },
-              { icon: <BarChart2 size={16} className="text-purple-500" />, label: 'AI Insights', desc: 'Pattern analysis & nudges' },
-            ].map((f, i) => (
-              <motion.div
-                key={f.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.1 }}
-                className="bg-white border border-gray-100 rounded-2xl p-4 text-left shadow-card"
+        <section className="home-features" aria-label="QuestMind features">
+          <div className="home-section-intro"><span>MADE FOR REAL LIFE</span><p>Less pressure. More progress.</p></div>
+          <div className="home-feature-grid">
+            {FEATURES.map(({ icon:Icon, label, desc, color, tint }, index) => (
+              <motion.article
+                key={label} className="home-feature-card"
+                initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.18 + index * 0.08 }}
               >
-                <div className="mb-2">{f.icon}</div>
-                <p className="text-sm font-medium text-ink mb-0.5">{f.label}</p>
-                <p className="text-xs text-ink-dim">{f.desc}</p>
-              </motion.div>
+                <span className="home-feature-icon" style={{ background:tint, color }}><Icon size={17} /></span>
+                <div><h3>{label}</h3><p>{desc}</p></div>
+                <ArrowRight size={15} className="home-feature-arrow" />
+              </motion.article>
             ))}
           </div>
-        </motion.div>
+        </section>
       </main>
 
-      <footer className="text-center py-6 text-xs text-ink-dim border-t border-gray-100">
-        QuestMind · St. Francis Institute of Technology · Hackanova 5.0
-      </footer>
+      <footer className="home-footer"><span>QuestMind</span><span>Small steps, lasting change.</span></footer>
     </div>
   )
 }

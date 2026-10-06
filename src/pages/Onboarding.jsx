@@ -67,7 +67,7 @@ export default function Onboarding() {
   const steps = [
     // ── Step 0: Name ──────────────────────────────────────────────
     <motion.div key="s0" initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}>
-      <div style={{ ...card, padding: '40px 44px', maxWidth: 480, width: '100%' }}>
+      <div className="qm-onboarding-card" style={{ ...card, padding: '40px 44px', maxWidth: 480, width: '100%' }}>
         {/* Logo */}
         <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
           <div style={{ width:8, height:8, borderRadius:'50%', background:'#14b8a6' }} />
@@ -75,6 +75,7 @@ export default function Onboarding() {
         </div>
         <p style={{ fontSize:12, color:'#94a3b8', marginBottom:36 }}>A cleaner way to build consistency</p>
 
+        <p className="qm-onboarding-step">STEP {step + 1} OF 4</p>
         {/* Progress */}
         <div style={{ display:'flex', gap:4, marginBottom:32 }}>
           {[0,1,2,3].map(i => (
@@ -124,7 +125,8 @@ export default function Onboarding() {
 
     // ── Step 1: Focus Areas ───────────────────────────────────────
     <motion.div key="s1" initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}>
-      <div style={{ ...card, padding:'40px 44px', maxWidth:520, width:'100%' }}>
+      <div className="qm-onboarding-card" style={{ ...card, padding:'40px 44px', maxWidth:520, width:'100%' }}>
+        <p className="qm-onboarding-step">STEP {step + 1} OF 4</p>
         <div style={{ display:'flex', gap:4, marginBottom:28 }}>
           {[0,1,2,3].map(i => (
             <div key={i} style={{ flex:1, height:3, borderRadius:99, background: i <= step ? '#14b8a6' : '#e2e8f0' }} />
@@ -183,7 +185,8 @@ export default function Onboarding() {
 
     // ── Step 2: Rhythm ────────────────────────────────────────────
     <motion.div key="s2" initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}>
-      <div style={{ ...card, padding:'40px 44px', maxWidth:480, width:'100%' }}>
+      <div className="qm-onboarding-card" style={{ ...card, padding:'40px 44px', maxWidth:480, width:'100%' }}>
+        <p className="qm-onboarding-step">STEP {step + 1} OF 4</p>
         <div style={{ display:'flex', gap:4, marginBottom:28 }}>
           {[0,1,2,3].map(i => (
             <div key={i} style={{ flex:1, height:3, borderRadius:99, background: i <= step ? '#14b8a6' : '#e2e8f0' }} />
@@ -237,7 +240,8 @@ export default function Onboarding() {
 
     // ── Step 3: AI Team ───────────────────────────────────────────
     <motion.div key="s3" initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-10 }}>
-      <div style={{ ...card, padding:'40px 44px', maxWidth:480, width:'100%' }}>
+      <div className="qm-onboarding-card" style={{ ...card, padding:'40px 44px', maxWidth:480, width:'100%' }}>
+        <p className="qm-onboarding-step">STEP {step + 1} OF 4</p>
         <div style={{ display:'flex', gap:4, marginBottom:28 }}>
           {[0,1,2,3].map(i => (
             <div key={i} style={{ flex:1, height:3, borderRadius:99, background: i <= step ? '#14b8a6' : '#e2e8f0' }} />
@@ -291,7 +295,7 @@ export default function Onboarding() {
   ]
 
   return (
-    <div style={{
+    <div className="qm-onboarding-page" style={{
       minHeight:'100vh', background: bg,
       display:'flex', alignItems:'center', justifyContent:'center', padding:'24px',
     }}>

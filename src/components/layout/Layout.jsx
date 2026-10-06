@@ -19,7 +19,7 @@ export default function Layout() {
   const title = TITLES[location.pathname] || 'QuestMind'
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#f7f6f3' }}>
+    <div className="qm-app-shell" style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#f6f8f7' }}>
       <Sidebar onProfileOpen={() => setProfileOpen(true)} />
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
