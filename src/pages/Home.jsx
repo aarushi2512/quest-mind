@@ -28,13 +28,13 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="max-w-2xl"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-medium mb-6">
+          {/* <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-medium mb-6">
             <Zap size={12} /> Hackanova 5.0 — Agentic AI Track
-          </div>
+          </div> */}
 
           <h1 className="font-display text-5xl font-light tracking-tight text-ink leading-tight mb-4">
-            Break the loop.<br />
-            <em>Create the future.</em>
+            Build habits that<br />
+            <em className="text-brand-600">actually stick.</em>
           </h1>
 
           <p className="text-lg text-ink-sub font-light mb-10 leading-relaxed">
@@ -47,13 +47,13 @@ export default function Home() {
               to="/auth"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl transition-colors text-sm"
             >
-              Start for free <ArrowRight size={15} />
+              Start your journey <ArrowRight size={15} />
             </Link>
             <Link
-              to="/auth"
+              to="/dashboard"
               className="inline-flex items-center justify-center px-6 py-3 bg-white border border-gray-200 hover:border-gray-300 text-ink font-medium rounded-xl transition-colors text-sm"
             >
-              Sign in
+              View dashboard
             </Link>
           </div>
 
