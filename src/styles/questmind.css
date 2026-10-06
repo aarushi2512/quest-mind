@@ -169,6 +169,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .qm-profile-modal { border:1px solid #e3ede9; border-radius:21px !important; box-shadow:0 24px 80px rgba(18,50,42,.2) !important; }
 
 @media (max-width:760px) {
+  .qm-auth-page { overflow-y:auto !important; align-items:flex-start !important; padding-top:26px !important; padding-bottom:26px !important; }
   .qm-sidebar { width:190px !important; }
   .qm-two-col { grid-template-columns:1fr !important; }
   .qm-stat-grid-4 { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
@@ -201,6 +202,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .qm-sidebar > div:last-child > button:first-of-type > svg { display:none; }
   .qm-topbar { padding:0 14px !important; }
   .qm-page { padding:20px 14px 32px !important; }
+  .qm-onboarding-card { padding:27px 20px !important; }
   .qm-page-hero { min-height:0; padding:19px 17px; }
   .qm-hero-badge { padding:8px 10px; }
   .qm-hero-badge span { font-size:20px; }
